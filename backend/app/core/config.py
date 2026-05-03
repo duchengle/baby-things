@@ -1,6 +1,8 @@
+from pathlib import Path
+import re
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pathlib import Path
 
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -26,6 +28,24 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def _normalize_sqlite_url(url: str) -> str:
+    prefix = "sqlite:///"
+    if not url.startswith(prefix):
+        return url
+
+    raw_path = url[len(prefix):]
+    if raw_path.startswith("/"):
+        return url
+    if re.match(r"^[A-Za-z]:[\\/]", raw_path):
+        return url
+
+    relative_path = raw_path[2:] if raw_path.startswith("./") else raw_path
+    return f"sqlite:///{(BASE_DIR / relative_path).as_posix()}"
+
+
+settings.sqlite_url = _normalize_sqlite_url(settings.sqlite_url)
 
 
 def get_cors_origins() -> list[str]:

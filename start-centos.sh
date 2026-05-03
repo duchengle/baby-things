@@ -95,7 +95,8 @@ stop_if_running "$BACKEND_PID_FILE"
 stop_if_running "$FRONTEND_PID_FILE"
 
 echo "[INFO] Starting backend on 0.0.0.0:$BACKEND_PORT ..."
-nohup "$VENV_DIR/bin/python" -m uvicorn app.main:app --app-dir "$BACKEND_DIR" --host 0.0.0.0 --port "$BACKEND_PORT" > "$LOG_DIR/backend.log" 2>&1 &
+cd "$BACKEND_DIR"
+nohup "$VENV_DIR/bin/python" -m uvicorn app.main:app --host 0.0.0.0 --port "$BACKEND_PORT" > "$LOG_DIR/backend.log" 2>&1 &
 echo $! > "$BACKEND_PID_FILE"
 
 echo "[INFO] Starting frontend preview on 0.0.0.0:$FRONTEND_PORT ..."
