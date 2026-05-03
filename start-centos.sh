@@ -96,6 +96,21 @@ stop_if_running "$FRONTEND_PID_FILE"
 
 echo "[INFO] Starting backend on 0.0.0.0:$BACKEND_PORT ..."
 cd "$BACKEND_DIR"
+
+DB_URL="$($VENV_DIR/bin/python -c 'from app.core.config import settings; print(settings.sqlite_url)' 2>/dev/null || true)"
+if [[ "$DB_URL" == sqlite:///* ]]; then
+  DB_FILE="${DB_URL#sqlite:///}"
+  echo "[INFO] Resolved SQLite URL: $DB_URL"
+  echo "[INFO] Resolved DB file: $DB_FILE"
+  if [[ -f "$DB_FILE" ]]; then
+    echo "[INFO] DB file already exists."
+  else
+    echo "[INFO] DB file does not exist yet. It will be created when backend startup initializes tables."
+  fi
+else
+  echo "[WARN] Could not resolve sqlite db path from settings. Current SQLITE_URL: ${DB_URL:-<empty>}"
+fi
+
 nohup "$VENV_DIR/bin/python" -m uvicorn app.main:app --host 0.0.0.0 --port "$BACKEND_PORT" > "$LOG_DIR/backend.log" 2>&1 &
 echo $! > "$BACKEND_PID_FILE"
 

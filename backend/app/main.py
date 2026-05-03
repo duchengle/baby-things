@@ -14,8 +14,10 @@ app = FastAPI(title=settings.app_name)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_cors_origins(),
+    allow_origin_regex=r"https?://([a-z0-9-]+\.)*leateen\.com(:\d+)?$",
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True,
 )
 
 
