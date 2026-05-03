@@ -10,6 +10,7 @@ PID_DIR="$ROOT_DIR/run"
 
 BACKEND_PORT="${BACKEND_PORT:-8001}"
 FRONTEND_PORT="${FRONTEND_PORT:-4173}"
+FRONTEND_DEPLOY_DIR="${FRONTEND_DEPLOY_DIR:-/www/wwwroot/baby.leateen.com}"
 
 mkdir -p "$LOG_DIR" "$PID_DIR"
 
@@ -76,7 +77,16 @@ else
 fi
 
 echo "[INFO] Building frontend..."
-npm run build
+npm run build:prod
+
+if [[ ! -d "$FRONTEND_DIR/dist" ]]; then
+  echo "[ERROR] Frontend dist directory not found after build."
+  exit 1
+fi
+
+echo "[INFO] Copying frontend dist to $FRONTEND_DEPLOY_DIR ..."
+mkdir -p "$FRONTEND_DEPLOY_DIR"
+cp -a "$FRONTEND_DIR/dist/." "$FRONTEND_DEPLOY_DIR/"
 
 BACKEND_PID_FILE="$PID_DIR/backend.pid"
 FRONTEND_PID_FILE="$PID_DIR/frontend.pid"
