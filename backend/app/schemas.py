@@ -62,6 +62,20 @@ class ActivityItemPublic(BaseModel):
     is_enabled: bool
 
 
+class ActivityItemCreate(BaseModel):
+    code: str = Field(min_length=1, max_length=30)
+    display_name: str = Field(min_length=1, max_length=100)
+    sort_order: int = 100
+    is_enabled: bool = True
+
+
+class ActivityItemUpdate(BaseModel):
+    code: str | None = Field(default=None, min_length=1, max_length=30)
+    display_name: str | None = Field(default=None, min_length=1, max_length=100)
+    sort_order: int | None = None
+    is_enabled: bool | None = None
+
+
 class ActivityCreate(BaseModel):
     baby_id: int
     activity_item_id: int | None = None

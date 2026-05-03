@@ -79,13 +79,14 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 Copy-Item .env.example .env
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
 ```
 
 说明：
 
 - 首次启动会自动创建 SQLite 数据库表。
 - 在 `.env` 中设置 `BOOTSTRAP_ADMIN_USERNAME` 和 `BOOTSTRAP_ADMIN_PASSWORD`，可自动初始化管理员账号。
+- 后端默认建议端口为 `8001`（部署脚本也默认使用 `8001`）。
 
 ### 2. 启动前端
 
@@ -98,6 +99,11 @@ npm run dev
 ```
 
 默认访问：`http://127.0.0.1:5173`
+
+前端环境区分：
+
+- 开发模式：`frontend/.env.development`，默认 `VITE_API_BASE_URL=/api`（通过 Vite 代理到本地后端 `8001`）
+- 生产打包：`frontend/.env.production`，默认 `VITE_API_BASE_URL=https://babyapi.leateen.com/api`
 
 ## 下一步建议
 

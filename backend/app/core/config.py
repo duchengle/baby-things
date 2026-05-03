@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     secret_key: str = Field(default="change-me-in-production")
     access_token_expire_minutes: int = 60 * 24
     sqlite_url: str = f"sqlite:///{(BASE_DIR / 'baby_things.db').as_posix()}"
+    cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173,https://baby.leateen.com,http://baby.leateen.com"
 
     # Admin bootstrapping
     bootstrap_admin_username: str | None = None
@@ -25,3 +26,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def get_cors_origins() -> list[str]:
+    return [item.strip() for item in settings.cors_origins.split(",") if item.strip()]

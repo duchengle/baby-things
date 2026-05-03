@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
+from app.core.config import get_cors_origins, settings
 from app.core.security import get_password_hash
 from app.db import Base, engine
 from app.models import Activity, ActivityItem, User, UserRole
@@ -13,7 +13,7 @@ app = FastAPI(title=settings.app_name)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=get_cors_origins(),
     allow_methods=["*"],
     allow_headers=["*"],
 )
