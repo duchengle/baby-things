@@ -23,12 +23,17 @@ body {
     linear-gradient(180deg, #fff7e5 0%, #fff2d2 100%);
   min-height: 100vh;
   overflow-x: hidden;
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
 }
 
 .app-shell {
   width: min(960px, 100%);
   margin: 0 auto;
   padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
 }
 
 .auth-shell {

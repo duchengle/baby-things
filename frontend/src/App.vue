@@ -40,7 +40,7 @@ watch(() => route.fullPath, refreshAdminCapability)
 <template>
   <main class="app-shell">
     <header v-if="!isPublicPage" class="top-nav card">
-      <div class="nav-title">宝宝记录</div>
+      <div class="nav-title">宝宝日记</div>
       <nav class="nav-actions">
         <router-link class="nav-link" to="/record">记录</router-link>
         <router-link class="nav-link" to="/dashboard">主页</router-link>

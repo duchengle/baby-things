@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="宝宝日记图标">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffe7b8" />
+      <stop offset="100%" stop-color="#ffd0a8" />
+    </linearGradient>
+    <linearGradient id="book" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#fff6ea" />
+    </linearGradient>
+  </defs>
+
+  <rect x="4" y="4" width="56" height="56" rx="15" fill="url(#bg)" />
+
+  <rect x="14" y="13" width="36" height="38" rx="7" fill="url(#book)" stroke="#f1b993" stroke-width="1.8" />
+  <rect x="14" y="13" width="7" height="38" rx="4" fill="#ffc9a8" />
+
+  <circle cx="32" cy="30" r="9.8" fill="#ffd9bd" stroke="#efb48f" stroke-width="1.4" />
+  <circle cx="28.6" cy="29" r="1.1" fill="#5f4b4b" />
+  <circle cx="35.4" cy="29" r="1.1" fill="#5f4b4b" />
+  <path d="M28.5 33.2c1.2 1.6 5.8 1.6 7 0" fill="none" stroke="#d7837d" stroke-width="1.4" stroke-linecap="round" />
+  <path d="M27.2 23.3c0-2.8 2.1-4.9 4.8-4.9 2.8 0 4.9 2.1 4.9 4.9" fill="#f7b1b1" />
+
+  <path d="M40 45l8.4-7.7 2.2 2.4-8.4 7.7-3.2.8z" fill="#73b7ef" />
+  <path d="M48.4 37.3l1.7-1.5a1.5 1.5 0 0 1 2.1.1l1.1 1.2a1.5 1.5 0 0 1-.1 2.1l-1.6 1.5z" fill="#ffcf7f" />
+</svg>
