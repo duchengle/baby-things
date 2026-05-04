@@ -3,6 +3,17 @@ import { computed, onMounted, ref, watch } from 'vue'
 
 import api from '../api'
 
+function getLocalDateString(date = new Date()) {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+function getLocalTimeString(date = new Date()) {
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+}
+
 const babies = ref([])
 const timeline = ref([])
 const activityItems = ref([])
@@ -10,11 +21,11 @@ const selectedActivityItemId = ref(null)
 const form = ref({
   baby_id: '',
   note: '',
-  happened_date: new Date().toISOString().slice(0, 10),
-  happened_time: new Date().toTimeString().slice(0, 5)
+  happened_date: getLocalDateString(),
+  happened_time: getLocalTimeString()
 })
 const message = ref('')
-const day = ref(new Date().toISOString().slice(0, 10))
+const day = ref(getLocalDateString())
 const deletingId = ref(null)
 const activityElapsedMap = ref({})
 
@@ -156,10 +167,13 @@ function buildHappenedAt() {
   return new Date().toISOString()
 }
 
-function setCurrentTime() {
+async function setCurrentTime() {
   const now = new Date()
-  form.value.happened_date = now.toISOString().slice(0, 10)
-  form.value.happened_time = now.toTimeString().slice(0, 5)
+  const currentDate = getLocalDateString(now)
+  form.value.happened_date = currentDate
+  form.value.happened_time = getLocalTimeString(now)
+  day.value = currentDate
+  await loadTimeline()
 }
 
 async function loadTimeline() {
