@@ -62,6 +62,11 @@ class ActivityItemPublic(BaseModel):
     is_enabled: bool
 
 
+class ActivityItemLastPublic(BaseModel):
+    code: str
+    last_happened_at: datetime | None
+
+
 class ActivityItemCreate(BaseModel):
     code: str = Field(min_length=1, max_length=30)
     display_name: str = Field(min_length=1, max_length=100)

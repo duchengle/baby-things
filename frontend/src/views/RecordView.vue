@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import api from '../api'
 
@@ -16,6 +16,27 @@ const form = ref({
 const message = ref('')
 const day = ref(new Date().toISOString().slice(0, 10))
 const deletingId = ref(null)
+const activityElapsedMap = ref({})
+
+const timelineStats = computed(() => {
+  const counts = new Map()
+  const orderMap = new Map(activityItems.value.map((item) => [item.code, item.sort_order]))
+  for (const item of timeline.value) {
+    const code = item.activity_type
+    const label = item.activity_type_name || code
+    if (!counts.has(code)) {
+      counts.set(code, { code, label, count: 0 })
+    }
+    counts.get(code).count += 1
+  }
+  return Array.from(counts.values())
+    .filter((item) => item.count > 0)
+    .sort((a, b) => {
+      const orderA = orderMap.get(a.code) ?? Number.MAX_SAFE_INTEGER
+      const orderB = orderMap.get(b.code) ?? Number.MAX_SAFE_INTEGER
+      return orderA - orderB || a.label.localeCompare(b.label, 'zh-CN')
+    })
+})
 
 async function loadBabies() {
   const { data } = await api.get('/babies')
@@ -30,6 +51,70 @@ async function loadActivityItems() {
   activityItems.value = data
   if (!selectedActivityItemId.value && data.length) {
     selectedActivityItemId.value = data[0].id
+  }
+}
+
+function formatElapsedDuration(lastAt, selectedAt) {
+  const from = new Date(lastAt)
+  const to = new Date(selectedAt)
+  if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
+    return 'N/A'
+  }
+
+  let diffMs = to.getTime() - from.getTime()
+  if (diffMs < 0) {
+    diffMs = 0
+  }
+
+  const totalMinutes = Math.floor(diffMs / 60000)
+  const days = Math.floor(totalMinutes / (24 * 60))
+  const hours = Math.floor((totalMinutes % (24 * 60)) / 60)
+  const minutes = totalMinutes % 60
+
+  const parts = []
+  if (days > 0) {
+    parts.push(`${days}天`)
+  }
+  if (hours > 0) {
+    parts.push(`${hours}小时`)
+  }
+  parts.push(`${minutes}分钟`)
+  return parts.join('')
+}
+
+async function loadActivityElapsed() {
+  if (!form.value.baby_id) {
+    activityElapsedMap.value = {}
+    return
+  }
+
+  const selectedAt = buildHappenedAt()
+  try {
+    const { data } = await api.get('/activities/activity-items-last', {
+      params: {
+        baby_id: Number(form.value.baby_id),
+        happened_before: selectedAt
+      }
+    })
+
+    const elapsed = {}
+    for (const row of data) {
+      elapsed[row.code] = row.last_happened_at
+        ? formatElapsedDuration(row.last_happened_at, selectedAt)
+        : 'N/A'
+    }
+    for (const item of activityItems.value) {
+      if (!elapsed[item.code]) {
+        elapsed[item.code] = 'N/A'
+      }
+    }
+    activityElapsedMap.value = elapsed
+  } catch {
+    const fallback = {}
+    for (const item of activityItems.value) {
+      fallback[item.code] = 'N/A'
+    }
+    activityElapsedMap.value = fallback
   }
 }
 
@@ -109,8 +194,16 @@ async function deleteActivity(item) {
 onMounted(async () => {
   await loadActivityItems()
   await loadBabies()
+  await loadActivityElapsed()
   await loadTimeline()
 })
+
+watch(
+  [() => form.value.baby_id, () => form.value.happened_date, () => form.value.happened_time],
+  () => {
+    loadActivityElapsed()
+  }
+)
 </script>
 
 <template>
@@ -134,7 +227,8 @@ onMounted(async () => {
           :style="item.id === selectedActivityItemId ? 'outline: 3px solid #ff956f;' : ''"
           @click="selectedActivityItemId = item.id"
         >
-          {{ item.display_name }}
+          <span class="icon-btn-title">{{ item.display_name }}</span>
+          <span class="icon-btn-sub">{{ activityElapsedMap[item.code] || 'N/A' }}</span>
         </button>
       </div>
 
@@ -158,6 +252,11 @@ onMounted(async () => {
 
     <article class="card">
       <h2 class="title">每日时间轴</h2>
+      <div v-if="timelineStats.length" class="timeline-stats" aria-label="当天活动次数统计">
+        <span v-for="stat in timelineStats" :key="stat.label" class="stats-chip">
+          {{ stat.label }} {{ stat.count }}次
+        </span>
+      </div>
       <div class="list">
         <div v-for="item in timeline" :key="item.id" class="item">
           <div class="item-head">

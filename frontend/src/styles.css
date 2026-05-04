@@ -183,6 +183,23 @@ button.ghost {
   background: #fff;
   color: var(--ink-main);
   font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.icon-btn-title {
+  line-height: 1.1;
+}
+
+.icon-btn-sub {
+  font-size: 11px;
+  font-weight: 600;
+  color: #7a718d;
+  line-height: 1.1;
 }
 
 .list {
@@ -212,6 +229,26 @@ button.ghost {
   color: #8e2d2d;
   background: #fff0f0;
   flex-shrink: 0;
+}
+
+.timeline-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 2px 0 8px;
+}
+
+.stats-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 2px solid #f3d39d;
+  background: #fff7ea;
+  color: #4c3f58;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .note {

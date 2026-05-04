@@ -1,12 +1,12 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 from sqlalchemy.orm import Session, joinedload
 
 from app.deps import get_approved_user, get_db
 from app.models import Activity, ActivityImage, ActivityItem, BabyAccess, User
-from app.schemas import ActivityCreate, ActivityItemPublic, ActivityPublic
+from app.schemas import ActivityCreate, ActivityItemLastPublic, ActivityItemPublic, ActivityPublic
 
 router = APIRouter(prefix="/activities", tags=["activities"])
 
@@ -19,6 +19,37 @@ def list_activity_items(db: Session = Depends(get_db), _user: User = Depends(get
         .order_by(ActivityItem.sort_order.asc(), ActivityItem.id.asc())
         .all()
     )
+
+
+@router.get("/activity-items-last", response_model=list[ActivityItemLastPublic])
+def list_activity_items_last(
+    baby_id: int,
+    happened_before: datetime = Query(description="Selected datetime in ISO format"),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_approved_user),
+):
+    if not _can_view(db, user, baby_id):
+        raise HTTPException(status_code=403, detail="No view permission")
+
+    items = (
+        db.query(ActivityItem)
+        .filter(ActivityItem.is_enabled.is_(True))
+        .order_by(ActivityItem.sort_order.asc(), ActivityItem.id.asc())
+        .all()
+    )
+
+    latest_rows = (
+        db.query(Activity.activity_type, func.max(Activity.happened_at).label("last_happened_at"))
+        .filter(Activity.baby_id == baby_id, Activity.happened_at <= happened_before)
+        .group_by(Activity.activity_type)
+        .all()
+    )
+    latest_map = {row.activity_type: row.last_happened_at for row in latest_rows}
+
+    return [
+        ActivityItemLastPublic(code=item.code, last_happened_at=latest_map.get(item.code))
+        for item in items
+    ]
 
 
 def _can_record(db: Session, user: User, baby_id: int) -> bool:
