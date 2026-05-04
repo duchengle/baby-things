@@ -193,6 +193,22 @@ button.ghost {
   padding: 10px;
 }
 
+.item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.danger-btn {
+  min-height: 34px;
+  padding: 0 10px;
+  border-color: #f5b4b4;
+  color: #8e2d2d;
+  background: #fff0f0;
+  flex-shrink: 0;
+}
+
 .note {
   font-size: 14px;
   color: var(--ink-soft);

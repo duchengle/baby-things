@@ -119,3 +119,18 @@ def list_timeline(
         )
         for item in records
     ]
+
+
+@router.delete("/{activity_id}")
+def delete_activity(activity_id: int, db: Session = Depends(get_db), user: User = Depends(get_approved_user)):
+    activity = db.query(Activity).filter(Activity.id == activity_id).first()
+    if not activity:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    if user.role != "admin":
+        if not _can_view(db, user, activity.baby_id):
+            raise HTTPException(status_code=403, detail="No view permission")
+
+    db.delete(activity)
+    db.commit()
+    return {"ok": True}

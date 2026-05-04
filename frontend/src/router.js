@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
 import AdminView from './views/AdminView.vue'
 import DashboardView from './views/DashboardView.vue'
@@ -7,7 +7,7 @@ import RegisterView from './views/RegisterView.vue'
 import RecordView from './views/RecordView.vue'
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes: [
     { path: '/', redirect: '/record' },
     { path: '/login', name: 'login', component: LoginView },

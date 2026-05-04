@@ -15,6 +15,7 @@ const form = ref({
 })
 const message = ref('')
 const day = ref(new Date().toISOString().slice(0, 10))
+const deletingId = ref(null)
 
 async function loadBabies() {
   const { data } = await api.get('/babies')
@@ -88,6 +89,23 @@ async function loadTimeline() {
   timeline.value = data
 }
 
+async function deleteActivity(item) {
+  const confirmed = window.confirm(`确认删除“${item.activity_type_name || item.activity_type}”这条记录吗？`)
+  if (!confirmed) return
+
+  deletingId.value = item.id
+  message.value = ''
+  try {
+    await api.delete(`/activities/${item.id}`)
+    await loadTimeline()
+    message.value = '记录已删除'
+  } catch (err) {
+    message.value = err.response?.data?.detail || '删除失败'
+  } finally {
+    deletingId.value = null
+  }
+}
+
 onMounted(async () => {
   await loadActivityItems()
   await loadBabies()
@@ -142,7 +160,17 @@ onMounted(async () => {
       <h2 class="title">每日时间轴</h2>
       <div class="list">
         <div v-for="item in timeline" :key="item.id" class="item">
-          <strong>{{ item.activity_type_name || item.activity_type }}</strong>
+          <div class="item-head">
+            <strong>{{ item.activity_type_name || item.activity_type }}</strong>
+            <button
+              type="button"
+              class="ghost danger-btn"
+              :disabled="deletingId === item.id"
+              @click="deleteActivity(item)"
+            >
+              {{ deletingId === item.id ? '删除中...' : '删除' }}
+            </button>
+          </div>
           <div class="note">{{ new Date(item.happened_at).toLocaleString() }}</div>
           <div>{{ item.note }}</div>
         </div>
